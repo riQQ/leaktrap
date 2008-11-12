@@ -2,15 +2,17 @@
 
 Make sure you go through [Installation] steps before reading this article.
 
-Once you have everything setup, simply launch the application as usual to start tracking gdi/user handles.
-Whenever the application is terminated, and a debugger is attached and if any allocations are still active, the debugger will receive a debug break and you will be able to browse the remaining allocations.
-Note, though, that it is hardly a 100% indication of a handle leak - some libraries might not have been unloaded and still hold handles in their caches.
+Once you have everything set up, simply launch the application as usual to start tracking gdi/user handles.
+The client library will check for any active allocations at program termination and issue a debug break if any allocations are still active. Meaning, you'll need a debugger attached prior to application termination in order to able to view allocation statistics.
 
-Whenever you wish to check the allocation statistics, you need to launch a debugger from [http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx Windows Debugging Tools package] (windbg, cdb or ntsd), break and issue the following command:
+Note, though, that it is hardly a 100% indication of a handle leak - some libraries might not have been unloaded and still hold handles in their caches (I know Qt does, and so do many others).
+
+The same goes for regular allocation statistics checks.
+Assuming you have a debugger attached, have it break in and issue the following command to display statistics:
 
   `!leakdbg.handle -stats`
 
-Now, since the extension is using debugger's markup language, it is best to use windbg.exe to minimize the typing (it will hyperlink most of its output for better navigation experience).
+_Although you could use any debugger implementation that's part of the Windows Debugging Tools (cdb, windbg or ntsd), since the extension is using debugger's markup language, it is best to use windbg.exe to minimize the typing (it will hyperlink most of its output for better navigation experience)_.
 
 Issuing `leakdbg.help` will display help describing all the supported operations.
 Here's a brief description of the commands:
