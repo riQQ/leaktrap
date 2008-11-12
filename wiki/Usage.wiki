@@ -1,12 +1,8 @@
 #summary Usage scenarios / brief description.
 
-Using `setdll.exe` you can bind the client `LeakTrap` library as a first import to your app:
+Make sure you go through [Installation] steps before reading this article.
 
-  `setdll[.exe] /d:LeakTrap.dll yourapp.exe`
-
-Make sure you copy `detoured.dll` (from the bin folder of your Detours distribution) to your application folder together with `LeakTrap.dll` to mark the application as being detoured. Make additionaly sure you copy the debugger extension (`leakdgb.dll`) to your windows debugger extensions folder (winxp).
-
-Now, simply launch the application as usual to start tracking gdi/user handles.
+Once you have everything setup, simply launch the application as usual to start tracking gdi/user handles.
 Whenever the application is terminated, and a debugger is attached and if any allocations are still active, the debugger will receive a debug break and you will be able to browse the remaining allocations.
 Note, though, that it is hardly a 100% indication of a handle leak - some libraries might not have been unloaded and still hold handles in their caches.
 
