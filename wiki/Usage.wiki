@@ -1,4 +1,4 @@
-#summary Usage scenarios / breif description.
+#summary Usage scenarios / brief description.
 
 Using `setdll.exe` you can bind the client `LeakTrap` library as a first import to your app:
 
