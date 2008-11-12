@@ -8,15 +8,13 @@ This page will briefly introduce the framework and outline steps required to set
 
 ==  Architecture ==
 
-The framework is basically two DLLs : each responsible for its bits.
-
-LeakTrap.dll is the allocation/deallocation audit core which is bound as an import
+`LeakTrap` is the allocation/deallocation audit core which is bound as an import
 library on-demand to the target application that you wish to track handle usage for.
 This functionality comes from a [http://research.microsoft.com/sn/detours/ Detours library], so you should download build it (at least the library itself and the setdll example).
 
-LeakTrap is pretty lightweight. It's been currently developed with VC71 and has a dependency on its STL implementation (msvcp71.dll).
+LeakTrap is pretty lightweight. It's been currently developed with VC71 and has a dependency on its STL implementation (`msvcp71`).
 
-The debugger extension is developed using Windows DDK package and does not have any special dependencies (msvcrt.dll). It is however, dependant on the fact that the client library is VC71-based as it is relying on internal structure of VC71's stdext::hash_map<> implementation to be able to access and display collected information.
+The debugger extension is developed using Windows DDK package and does not have any special dependencies (`msvcrt`). It is however, dependant on the fact that the client library is VC71-based as it is relying on internal structure of VC71's stdext::hash_map<> implementation to be able to access and display collected information.
 
 == Setting up ==
 
