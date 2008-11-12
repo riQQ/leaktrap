@@ -1,6 +1,6 @@
 #summary A few one-liners on the design/implementation.
 
-= Introduction =
+= Design/Implementation overviews =
 
 For those interested to know how things are implemented before they skip through the source code.
 
