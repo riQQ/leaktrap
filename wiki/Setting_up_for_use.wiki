@@ -1,4 +1,4 @@
-#summary Introduces the framework and lists step to set it up.
+#summary Introduces the framework and lists steps to set it up.
 
 = Introduction =
 
