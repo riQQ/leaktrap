@@ -9,4 +9,9 @@ The implementation has been kept very simple. It is a poorman's effective tool a
 One of the grounds I laid prior to coding has been the avoidance of the C preprocessor. That's why I setlled on a simple code generator written in JScript's implementation of EcmaScript standard.
 I also opted for maximal code/functionlity reuse. Which means I only concieved the internal data structures used to keep stats on resource allocations. I did not bother myself with either code injection (courtesy of Detours library) nor with IPC (implemented via remote access from debugger directly into the debugged target's memory). This means there's as much to a fancy GUI as you can get with `windbg`. Not much of a problem - I assure you, after having successfully nailed down most of the elusive resource leaks in the code base of a product I'm currently working on, I can only recommend it.
 
-The weakest link in the whole picture, in my opinion, is the complexity of such a remote access implementation and its dependence on the exact version of the compiler's STL (version 1.0 supports STL from VC71) as a result of a design decision to rely on hash_map<> data structure to store resource allocation statistics.
+The weakest link in the whole picture, in my opinion, is the complexity of such a remote access implementation and its dependence on the exact version of the compiler's STL (version 1.0 supports STL from VC71) as a result of a design decision to rely on hash_map<> data structure to store resource allocations.
+
+Well, implementing a leak tracker is easy. It is even eaiser the more you think about it. With all the tools at your disposal, nothing seems impossible. The harder problem is evaluating information such a leak tracker will present you with. Which are false positives? Which are cached resources? Why would you miss a resource release?
+
+These problems kept creeping at me once I started the development.
+Well, for starters, I figured, in `gdi32.dll` world, would it not be nice to supress allocations which are caused by other higher-level APIs from the same `gdi` namespace?
