@@ -15,3 +15,14 @@ Well, implementing a leak tracker is easy. It is even eaiser the more you think 
 
 These problems kept creeping at me once I started the development.
 Well, for starters, I figured, in `gdi32.dll` world, would it not be nice to supress allocations which are caused by other higher-level APIs from the same `gdi` namespace?
+Which I implemented by setting a nested_call flag at the beginning of the allocation routine and clearing it at its end. Any allocations that happen as a result of a current call thus get supressed. Is it a good thing? For some allocations, sure. But I would not go as far as enabling it for everything else (especially `user32`, which indeed invokes user code and its user code I was inteded to bulletproof in the first place).
+How about unobvious API allocation rules? For instance, child windows (`CreateWindow`) get implicitly removed when you `DestroyWindow` a parent hwnd.
+Or take `LoadImage` for example which creates 3 distinct types of GDI/USER objects:
+ * bitmap (deleted with `DeleteObject`)
+ * cursor (deleted with `DestroyCursor`)
+ * icon (deleted with `DestroyIcon`)
+
+Having given it a bit of thoight, I decided to factor the cleanup decision rules into a separate entity I named `cleanup_callback` which is responsible for determining which allocation corresponds to a particular type of a release.
+
+Also, I figured catching errors of allocation/release mismatch would be a great thing.
+The tracker will warn you about such cases by issuing a debug break each time a violation is detected and a debugger is currently attached. Sometimes, though, resources are composite, consisting of little lower-level parts - and it bites back giving me debug breaks at wrong places (_this issue has not yet been addressed_).
