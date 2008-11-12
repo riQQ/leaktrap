@@ -1,0 +1,12 @@
+#summary A few one-liners on the design/implementation.
+
+= Introduction =
+
+For those interested to know how things are implemented before they skip through the source code.
+
+The implementation has been kept very simple. It is a poorman's effective tool at tracking leaks. The primary target for the framework have been the GDI/USER handle leaks but it can be extended to support any other types of leaks.
+
+One of the grounds I laid prior to coding has been the avoidance of the C preprocessor. That's why I setlled on a simple code generator written in JScript's implementation of EcmaScript standard.
+I also opted for maximal code/functionlity reuse. Which means I only concieved the internal data structures used to keep stats on resource allocations. I did not bother myself with either code injection (courtesy of Detours library) nor with IPC (implemented via remote access from debugger directly into the debugged target's memory). This means there's as much to a fancy GUI as you can get with `windbg`. Not much of a problem - I assure you, after having successfully nailed down most of the elusive resource leaks in the code base of a product I'm currently working on, I can only recommend it.
+
+The weakest link in the whole picture, in my opinion, is the complexity of such a remote access implementation and its dependence on the exact version of the compiler's STL (version 1.0 supports STL from VC71) as a result of a design decision to rely on hash_map<> data structure to store resource allocation statistics.
