@@ -1,0 +1,48 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+This page will briefly introduce the framework and outline steps required to set it up for work.
+
+= Details =
+
+==  Architecture ==
+
+The framework is basically two DLLs : each responsible for its bits.
+
+LeakTrap.dll is the allocation/deallocation audit core which is bound as an import
+library on-demand to the target application that you wish to track handle usage for.
+This functionality comes from a [http://research.microsoft.com/sn/detours/ Detours library], so you should download build it (at least the library itself and the setdll example).
+
+LeakTrap is pretty lightweight. It's been currently developed with VC71 and has a dependency on its STL implementation (msvcp71.dll).
+
+The debugger extension is developed using Windows DDK package and does not have any special dependencies (msvcrt.dll). It is however, dependant on the fact that the client library is VC71-based as it is relying on internal structure of VC71's stdext::hash_map<> implementation to be able to access and display collected information.
+
+== Setting up ==
+
+Using `setdll.exe` you can bind LeakTrap.dll as a first import to your app:
+
+  `setdll[.exe] /d:LeakTrap.dll yourapp.exe`
+
+Make sure you copy detoured.dll (from the bin folder of your Detours distribution) to your application folder together with LeakTrap.dll to mark the application as being detoured. Make additionaly sure you copy the debugger extension (leakdgb.dll) to your windows debugger extensions folder (winxp).
+
+Now, simply launch the application as usual to start tracking gdi/user handles.
+
+Whenever you wish to check the allocation statistics, you need to launch a debugger from [http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx Windows Debugging Tools package] (windbg, cdb or ntsd), break and issue the following command:
+
+  `!leakdbg.handle -stats`
+
+Now, since the extension is using debugger's markup language, it is best to use windbg.exe to minimize the typing (it will hyperlink most of its output for better navigation experience).
+
+Issuing `leakdbg.help` will display help describing all the supported operations.
+Here's a brief description of the most common:
+
+ * use `leakdbg.handle -list` to get the list of all active allocations
+ * `leakdbg.handle -h <handle>` will display allocation stack for a particular handle value
+ * use `leakdbg.handle -snapshot` to take a snapshot of the currently active allocations
+ * use `leakdbg.handle -stats -diff` to display statistics compared to the prevously taken snapshot
+
+Snapshots can be saved to a file whenever running under a debugger causes a performance degradation and re-read at a later point:
+
+  `leakdbg.handle -snapshot -write yourapp.sht`
+  `leakdbg.handle -snapshot -read yourapp.sht`
