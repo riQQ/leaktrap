@@ -3,7 +3,7 @@
  * Download [http://research.microsoft.com/sn/detours/ Detours library], follow the readme steps to build it (at least you will need the import library `detours.lib`, the detoured indicator `detoured.dll` and the `setdll` example compiled.)
  * You could also compile the leaktrap project (the VC71 project file is inside the source code distribution) -> `leaktrap_vc71.dll`
  * You could also compile the leakdbg debugger extension (Windows DDK makefile is inside the source code distribution) -> `leakdbg.dll`
- * Or simply grab the binary distribution, which has been compiled using the Visual Studio 2003 (`leaktrap_vc71.dll`) and DDK version 1.1.6001.000 (`leakdbg.dll`)
+ * Alternatively simply grab the binary distribution, which has been compiled using the Visual Studio 2003 (`leaktrap_vc71.dll`) and DDK version 1.1.6001.000 (`leakdbg.dll`)
  * Copy `leaktrap_vc71.dll`, `detoured.dll`, and `setdll.exe` to the folder of your choice (usually the binary folder for your application).
  * Configure your application's executable to load the leaktrap client library by binding it as its first import:
   {{{
@@ -12,3 +12,8 @@
  * Make sure you have the [http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx Windows Debugging Tools package]
  * Copy `leakdbg.dll` to your Windows Debugging Tools package's extensions folder (usually winxp, for windows xp systems and later)
  * *You're all set*
+
+Any time an exported (system) API that is to be detoured is not found or stack capture routine is not available, the client library will return `FALSE` from its `DllMain` thus failing the complete application initialization.
+
+System requirements:
+ * Windows XP and later (since it relies on a system stack capture routine available in Windows XP - _it could be written manually though and thus made available to w2k_)
