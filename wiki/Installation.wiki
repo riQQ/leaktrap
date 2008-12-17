@@ -4,7 +4,7 @@
  * You could also compile the leaktrap project (the VC71 project file is inside the source code distribution) -> `leaktrap_vc71.dll`
  * You could also compile the leakdbg debugger extension (Windows DDK makefile is inside the source code distribution) -> `leakdbg.dll`
  * Alternatively simply grab the binary distribution, which has been compiled using the Visual Studio 2003 (`leaktrap_vc71.dll`) and DDK version 1.1.6001.000 (`leakdbg.dll`) plus additional binary extras archive that contains the vc71 runtime libraries and precompiled detoured.dll
- * Copy `leaktrap_vc71.dll`, `detoured.dll`, and `setdll.exe` to the folder of your choice (usually the binary folder for your application).
+ * Copy `leaktrap_vc71.dll`, `leaktrap_vc71.pdb` (<b>very important for debugger extension to work</b>!!), `detoured.dll`, and `setdll.exe` to the folder of your choice (usually the binary folder for your application).
  * Configure your application's executable to load the leaktrap client library by binding it as its first import:
   {{{
   setdll.exe /d:LeakTrap_vc71.dll yourapp.exe
