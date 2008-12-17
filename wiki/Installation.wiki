@@ -17,4 +17,4 @@ Any time an exported (system) API that is to be detoured is not found or stack c
 
 System requirements:
  * Windows XP and later (since it relies on a system stack capture routine available in Windows XP - _it could be written manually though and thus made available to w2k_)
- * Since the client library has been compiled with VC71, its runtime is also a requirement (msvcr71.dll + msvcp71.dll) (<i>I might need to bundle all extra binaries into a separate archive und upload it!..</i>)
+ * Since the client library has been compiled with VC71, its runtime is also a requirement (msvcr71.dll + msvcp71.dll) (if you do not have vc71 runtime, download bin_extras archive from Downloads section!)
