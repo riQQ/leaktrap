@@ -48,9 +48,9 @@ It basically describes functions that when matched on the allocation stack would
 
 Following iterative approach is the most common use of the framework:
 
-  * start your application, break in with the debugger and take an initial snapshot before a functionality loop. 
-  * let the application run for a few rounds when you know that resources that have been allocated at the round's start, should have also been released at it's end (if your application indeed features places like that).
-  * compare the currently active allocations with the previous snapshot
-  * make corrections to the supression rules file
-  * have your app run a few rounds more
+  * start your application, break in with the debugger and take an initial snapshot before any serious resource allocations take place. 
+  * let the application run through a few allocation/release loops.
+  * compare the currently active allocations with the previous snapshot.
+  * make corrections to the suppression rules file.
+  * have your application run a few loops more.
   * make a comparison, rule out impossibles, finalize your analysis by fixing the leaks ;o)
