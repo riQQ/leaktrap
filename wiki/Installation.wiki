@@ -11,6 +11,24 @@
   }}}
  * Make sure you have the [http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx Windows Debugging Tools package]
  * Copy `leakdbg.dll` to your Windows Debugging Tools package's extensions folder (usually winxp, for windows xp systems and later)
+ * If you're getting `LoadLibrary(leakdbg) failed. Win32 error 0n2` errors in debugger, you need to fix the extension path:
+  {{{
+  .extpath+ path_to_leakdbg.dll
+  }}}
+ * Fix the path to your application's pdb files by issuing:
+  {{{
+  .sympath+ path_to_pdb_files
+  .reload
+  }}}
+ prior to using the leak tracker. If you're not sure which modules you need .pdb files for, watch out for debugger messages:
+  {{{
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for C:\blah-blah\yourmodule1.dll -
+  }}}
+ Once you know the name of the module, fix its symbols:
+  {{{
+  .sympath+ path_to_yourmodule1.pdb
+  .reload /f yourmodule1.dll
+  }}}
  * *You're all set*
 
 Any time an exported (system) API that is to be detoured is not found or stack capture routine is not available, the client library will return `FALSE` from its `DllMain` thus failing the complete application initialization.
@@ -20,4 +38,4 @@ System requirements:
  * Since the client library has been compiled with VC71, its runtime is also a requirement (msvcr71.dll + msvcp71.dll) (if you do not have vc71 runtime, download bin_extras archive from Downloads section!)
 
 *Important*
- You need to have proper .pdb files for all modules you're inspecting for resource leaks. It is also important that these modules be compiled without frame pointer optimizations (-Oy- switch for visual studio!) as the used stack trace routine is very simple and relies solely on proper function frames to walk the stack!
+ You need to have proper .pdb files for all modules you're inspecting for resource leaks. It is also important that these modules be compiled without frame pointer optimizations (*-Oy-* switch for visual studio) as the used stack trace routine is very simple and relies solely on proper function frames to walk the stack!
