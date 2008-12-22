@@ -18,7 +18,7 @@ Issuing `!leakdbg.help` will display help describing all the supported operation
 Here's a brief description of the commands:
 
  * use `!leakdbg.handle -list` to get the list of all active allocations
- * `leakdbg.handle -h <handle>` will display allocation stack for a particular handle value
+ * `!leakdbg.handle -h <handle>` will display allocation stack for a particular handle value
  * use `!leakdbg.handle -snapshot` to take a snapshot of the currently active allocations
  * use `!leakdbg.handle -stats -diff` to display statistics compared to the prevously taken snapshot
 
