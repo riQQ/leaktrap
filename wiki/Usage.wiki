@@ -14,27 +14,27 @@ Assuming you have a debugger attached, have it break in and issue the following 
 
 _Although you could use any debugger implementation that's part of the Windows Debugging Tools (cdb, windbg or ntsd), since the extension is using debugger's markup language, it is best to use windbg.exe to minimize the typing (it will hyperlink most of its output for better navigation experience)_.
 
-Issuing `leakdbg.help` will display help describing all the supported operations.
+Issuing `!leakdbg.help` will display help describing all the supported operations.
 Here's a brief description of the commands:
 
- * use `leakdbg.handle -list` to get the list of all active allocations
+ * use `!leakdbg.handle -list` to get the list of all active allocations
  * `leakdbg.handle -h <handle>` will display allocation stack for a particular handle value
- * use `leakdbg.handle -snapshot` to take a snapshot of the currently active allocations
- * use `leakdbg.handle -stats -diff` to display statistics compared to the prevously taken snapshot
+ * use `!leakdbg.handle -snapshot` to take a snapshot of the currently active allocations
+ * use `!leakdbg.handle -stats -diff` to display statistics compared to the prevously taken snapshot
 
 Snapshots can be saved to a file whenever running under a debugger causes a performance degradation:
 
-  `leakdbg.handle -snapshot -write yourapp.sht`
+  `!leakdbg.handle -snapshot -write yourapp.sht`
 
 and re-read at a later point:
 
-  `leakdbg.handle -snapshot -read yourapp.sht`
+  `!leakdbg.handle -snapshot -read yourapp.sht`
 
 The special `-v` verbose flag is self-describing. The flag can be used with most of the commands to enhance their output.
 
 Whenever you feel you're getting way too many false positives (some allocations in what's referred to as system modules are pretty valid and are constantly causing "leaks"), you might want to start a so-called supressions filter file where you could describe multiple suppression rules for those allocations you wish to ignore:
 
-  `leakdbg.handle -filter -read windowsxp.flt`
+  `!leakdbg.handle -filter -read windowsxp.flt`
 
 The supression rules file format is very simple and naive:
 {{{
