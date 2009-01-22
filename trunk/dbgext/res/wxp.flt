@@ -1,0 +1,8 @@
+^user32!__clientloadmenu
+^comctl32!cccreatestatusfont
+^winmm!mciwindow
+^uxtheme!_ScaleRectsAndCreateRegion
+^uxtheme!_DupRgn
+^comdlg32!LoadBitmaps
+*user32!loadicocur
+*user32!__clientcopyimage
