@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Oy-"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\ExtLib\qt\include;..\..\ExtLib\Detours\src"
+				AdditionalIncludeDirectories="Detours\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LEAKTRAP_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -33,10 +33,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vpqt.lib detoured.lib detours.lib user32.lib gdi32.lib"
+				AdditionalDependencies="detoured.lib detours.lib user32.lib gdi32.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_vc71.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\ExtLib\qt\lib;..\..\ExtLib\Detours\lib"
+				AdditionalLibraryDirectories="Detours\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_vc71.pdb"
 				SubSystem="2"
@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Oy-"
-				AdditionalIncludeDirectories="..\..\ExtLib\qt\include;..\..\ExtLib\Detours\src"
+				AdditionalIncludeDirectories="Detours\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LEAKTRAP_EXPORTS;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -83,10 +83,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vpqt.lib detoured.lib detours.lib user32.lib gdi32.lib"
+				AdditionalDependencies="detoured.lib detours.lib user32.lib gdi32.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_vc71.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\ExtLib\qt\lib;..\..\ExtLib\Detours\lib"
+				AdditionalLibraryDirectories="Detours\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName)_vc71.pdb"
 				SubSystem="2"
