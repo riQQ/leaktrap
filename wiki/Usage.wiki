@@ -44,7 +44,7 @@ The supression rules file format is very simple and naive:
 }}}
 It basically describes functions that when matched on the allocation stack would prevent the debugger extension from including them in statistics (you can still have all allocations displayed by issuing a command with an `-ignore` switch).
 
-`^` denotes a function on the top of the allocation stack, while `*` denotes a function that can be found anywhere on the allocation stack (thus being a basic optimization step, `^` rules are processed first).
+`^` denotes a function on the top of the allocation stack, while `*` denotes a function that can be found anywhere on the allocation stack (simple optimization step since `^` rules are processed first).
 
 Following iterative approach is the most common use of the framework:
 
