@@ -31,7 +31,7 @@
   }}}
  * *You're all set*
 
-Any time an exported (system) API that is to be detoured is not found or stack capture routine is not available, the client library will return `FALSE` from its `DllMain` thus failing the complete application initialization.
+*A word of caution*: any time an exported (system) API that is to be detoured is not found or stack capture routine is not available (should not happen on systems with Windows XP and later!), the client library will return `FALSE` from its `DllMain` and *will fail* the complete application initialization.
 
 System requirements:
  * Windows XP and later (since it relies on a system stack capture routine available in Windows XP - _it could be written manually though and thus made available to w2k_)
