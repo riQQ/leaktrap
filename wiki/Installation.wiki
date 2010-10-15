@@ -36,7 +36,7 @@
 System requirements:
  * Windows XP and later (since it relies on a system stack capture routine available in Windows XP - _it could be written manually though and thus made available to w2k_)
  * Since the client library has been compiled with VC71, its runtime is also a requirement (msvcr71.dll + msvcp71.dll) (if you do not have vc71 runtime, download bin_extras archive from Downloads section!)
- * The library reportedly *does not* work under Windows 7 and I still do not have a Windows 7 system to test ;o(
+ * With the update, it is now usable on Windows 7
 
 *Important*
  You need to have proper .pdb files for all modules you're inspecting for resource leaks. It is also important that these modules be compiled without frame pointer optimizations (*-Oy-* switch for visual studio) as the used stack trace routine is very simple and relies solely on proper function frames to walk the stack!
