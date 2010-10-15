@@ -20,7 +20,7 @@
 
 */
 /*
-	Generated on Mittwoch, 12. November 2008 16:51:20. Do not EDIT!!!
+	Generated on Donnerstag, 14. Oktober 2010 11:08:05. Do not EDIT!!!
 */
 #pragma once
 
@@ -114,6 +114,15 @@ namespace detail
 		Function_CreateDialogIndirectParamW,
 		Function_CreateMDIWindowA,
 		Function_CreateMDIWindowW,
+		Function_CreateDesktopA,
+		Function_CreateDesktopW,
+		Function_OpenDesktopA,
+		Function_OpenDesktopW,
+		Function_OpenInputDesktop,
+		Function_CreateWindowStationA,
+		Function_CreateWindowStationW,
+		Function_OpenWindowStationA,
+		Function_OpenWindowStationW,
 		Function_DeleteObject,
 		Function_DeleteDC,
 		Function_DeleteMetaFile,
@@ -128,6 +137,8 @@ namespace detail
 		Function_DestroyAcceleratorTable,
 		Function_UnhookWindowsHookEx,
 		Function_DestroyMenu,
+		Function_CloseDesktop,
+		Function_CloseWindowStation,
 	} function_tag;
 	typedef enum
 	{

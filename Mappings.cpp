@@ -20,11 +20,12 @@
 
 */
 /*
-	Generated on Mittwoch, 12. November 2008 16:51:19. Do not EDIT!!!
+	Generated on Donnerstag, 14. Oktober 2010 11:08:05. Do not EDIT!!!
 */
 #define _WIN32_WINNT 0x0501	// we need WinXP anyways
 #include <windows.h>
 #include <wingdi.h>
+#include <stdio.h>	// sprintf()
 #include "Intercepts.h"
 
 
@@ -370,6 +371,42 @@ namespace detail
 			{
 				return "CreateMDIWindowW";
 			}
+			case Function_CreateDesktopA:
+			{
+				return "CreateDesktopA";
+			}
+			case Function_CreateDesktopW:
+			{
+				return "CreateDesktopW";
+			}
+			case Function_OpenDesktopA:
+			{
+				return "OpenDesktopA";
+			}
+			case Function_OpenDesktopW:
+			{
+				return "OpenDesktopW";
+			}
+			case Function_OpenInputDesktop:
+			{
+				return "OpenInputDesktop";
+			}
+			case Function_CreateWindowStationA:
+			{
+				return "CreateWindowStationA";
+			}
+			case Function_CreateWindowStationW:
+			{
+				return "CreateWindowStationW";
+			}
+			case Function_OpenWindowStationA:
+			{
+				return "OpenWindowStationA";
+			}
+			case Function_OpenWindowStationW:
+			{
+				return "OpenWindowStationW";
+			}
 			case Function_DeleteObject:
 			{
 				return "DeleteObject";
@@ -425,6 +462,14 @@ namespace detail
 			case Function_DestroyMenu:
 			{
 				return "DestroyMenu";
+			}
+			case Function_CloseDesktop:
+			{
+				return "CloseDesktop";
+			}
+			case Function_CloseWindowStation:
+			{
+				return "CloseWindowStation";
 			}
 			case Function_Undefined:
 			default:
@@ -536,7 +581,9 @@ namespace detail
 			case Handle_Undefined:
 			default:
 			{
-				return "";
+				static char buf[64];
+				sprintf(buf, "0x%X", static_cast<DWORD>(tag));
+				return buf;
 			}
 		}
 	}

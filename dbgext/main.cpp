@@ -168,6 +168,7 @@ private: // implementation
 	void add_rule(exclusion_map &rules, exclusion_rule const &rule);
 	bool match_addr_in_exclusions(ULONG64 addr, exclusion_map const &rules);
 	gdi_table build_table();
+	bool isWindows7() const;
 };
 CHAR EXT_CLASS::name_buffer[256]={'\0'};
 
@@ -184,7 +185,7 @@ namespace
 		bool ignore=ext.HasArg("ignore");
 		return (ignore || 
 				(!detail::IsGdiHandle(static_cast<detail::handle_tag>(node.htag())) && ext.filter(node)) || 
-				(table.find(handle)!=table.end() && ext.filter(node))
+				(table.empty() || (table.find(handle)!=table.end() && ext.filter(node)))
 				);
 	}
 }
@@ -193,13 +194,15 @@ namespace
 // the framework's assumed globals.
 EXT_DECLARE_GLOBALS();
 
-void EXT_CLASS::dump_stack(ExtRemoteStacktraceNode node, ULONG64 trace)
+void EXT_CLASS::dump_stack(ExtRemoteStacktraceNode node, ULONG64 trace = 0)
 {
 	LONG ftag=node.ftag(), ctag=node.ctag();
 	Out("Function tag: 0x%lx (%s)\n", ftag, detail::From(static_cast<detail::function_tag>(ftag)));
 	Out("Cleanup tag: 0x%lx (%s)\n", ctag, detail::From(static_cast<detail::function_tag>(ctag)));
 	Out("Allocated: %ld time(s)\n", node.allocation_count());
-	Out("Trace: 0x%lx\n", trace);
+	if (trace) {
+		Out("Trace: 0x%lx\n", trace);
+	}
 
 	USHORT frames=node.frames();
 	DWORD *stack=node.stack();
@@ -257,13 +260,15 @@ EXT_COMMAND(handle,
 			"{diff;b;;(Used with -list and -stats) Compare currently active allocations with last taken snapshot}"
 			"{read;x;file;(Used with -snapshot and -filter) Read data from a file}"
 			"{write;x;file;(Used with -snapshot) Store data to a file}"
+			"{raw;b;;(Used with -stats) Dumps raw stats to console}"
 			"{filter;b;;Manage exclusion configuration}"
 			"{ignore;b;;Ignore suppressions (display everything)}"
 			)
 {
-	bool verbose=HasArg("v");
+	bool const verbose=HasArg("v");
 	//bool ignore=HasArg("ignore");	// ignore suppressions
-	bool diff=HasArg("diff") && !is_empty(snapshot_);
+	bool const diff=HasArg("diff") && !is_empty(snapshot_);
+	bool const isWin7 = isWindows7();
 
 	ExtRemoteStackdb stackdb;
 	
@@ -319,8 +324,12 @@ EXT_COMMAND(handle,
 		{
 			snapshot_.clear();
 			std::ifstream f(GetArgStr("read"), std::ios::in|std::ios::binary);
-			f >> snapshot_;
-			if(verbose) Out("%ld handles read.\n", snapshot_.size());
+			if (f.is_open()) {
+				f >> snapshot_;
+				if(verbose) Out("%ld handles read.\n", snapshot_.size());
+			} else {
+				Out("Failed to open snapshot file '%s'.\n", GetArgStr("read"));
+			}
 		}
 		else
 		{
@@ -365,8 +374,11 @@ EXT_COMMAND(handle,
 	{
 		ExtRemoteAllocations allocations;
 		int alloc_count=allocations.count();
-		gdi_table table=build_table();
-		Out("Total allocations: %ld, (Total GDI handles: %ld (acc. to PEB))\n", alloc_count, table.size());
+		gdi_table table = isWin7 ? gdi_table() : build_table();
+		if (!isWin7)
+			Out("Total allocations: %ld, (Total GDI handles: %ld (acc. to PEB))\n", alloc_count, table.size());
+		else
+			Out("Total allocations: %ld\n", alloc_count);
 		if(diff) Out("*** Note: displaying positive diff compared to previous snapshot\n");
 
 		allocation_list list=elements(allocations, diff?snapshot_:snapshot_type());
@@ -393,7 +405,7 @@ EXT_COMMAND(handle,
 					Out("\tCleanup tag: %ld (%s)\n", node.ctag(), detail::From(static_cast<detail::function_tag>(node.ctag())));
 				}
 			}
-			// keep responsive
+			// stay responsive
 			g_Ext->ThrowInterrupt();
 		}
 	}
@@ -402,13 +414,17 @@ EXT_COMMAND(handle,
 	{
 		ExtRemoteAllocations allocations;
 		int alloc_count=allocations.count();
-		gdi_table table=build_table();
-		Out("Total allocations: %ld, (Total GDI handles: %ld (acc. to PEB))\n", alloc_count, table.size());
+		gdi_table table = isWin7 ? gdi_table() : build_table();
+		if (!isWin7)
+			Out("Total allocations: %ld, (Total GDI handles: %ld (acc. to PEB))\n", alloc_count, table.size());
+		else
+			Out("Total allocations: %ld\n", alloc_count);
 		if(diff) Out("*** Note: displaying positive diff compared to previous snapshot\n");
 
 		typedef std::map<detail::handle_tag,std::pair<ULONG,ULONG>> handle_list;
 		// @ds: <actual hits,suppressed hits>
 		handle_list handles;
+		bool const raw_mode = HasArg("raw");
 
 		allocation_list list=elements(allocations, diff?snapshot_:snapshot_type());
 		for(allocation_list::iterator it=list.begin();it != list.end();++it)
@@ -416,6 +432,11 @@ EXT_COMMAND(handle,
 			ExtRemoteStacktraceNode node(*stackdb.find(it->second.trace()));
 			if(node_to_display(*this,table,node,it->first))	// if not filtered out and (if GdiTypes.belongsTo() && GdiHandleTable.hasIt())
 			{
+				if (raw_mode) {
+					Out("Handle: 0x%X\n", it->first);
+					dump_stack(node);
+					continue;
+				}
 				std::pair<handle_list::iterator,bool> ret=handles.insert(std::make_pair(static_cast<detail::handle_tag>(node.htag()),std::make_pair(1,0)));
 				if(!ret.second)	// already available
 				{
@@ -431,12 +452,12 @@ EXT_COMMAND(handle,
 				}
 			}
 
-			// keep responsive
+			// stay responsive
 			g_Ext->ThrowInterrupt();
 		}
 
 		// dump usage stats
-		for(handle_list::const_iterator it=handles.begin();it != handles.end();++it)
+		for(handle_list::const_iterator it=handles.begin();!raw_mode && it != handles.end();++it)
 		{
 			std::stringstream command;
 			command << ".printf /D \"<link cmd=\\\"!leakdbg.handle -list " << (diff?"-diff":"") << " -ht " 
@@ -458,7 +479,7 @@ EXT_COMMAND(handle,
 								command.str().c_str(),
 								DEBUG_EXECUTE_NOT_LOGGED |
 								DEBUG_EXECUTE_NO_REPEAT);
-			// keep responsive
+			// stay responsive
 			g_Ext->ThrowInterrupt();
 		}
 	}
@@ -580,3 +601,13 @@ gdi_table EXT_CLASS::build_table()
 	if(verbose) Out("Building GDI handle table (PEB=0x%I64lx, PID=0x%lx)...\n",PebOffset,Pid);
 	return dbgext::build_table(ExtNtOsInformation::GetOsPeb(PebOffset), Pid, verbose);
 }
+bool EXT_CLASS::isWindows7() const
+{
+	ULONG Dummy=0L;
+	ULONG Versions[2];
+	if (SUCCEEDED(m_Advanced2->Request(DEBUG_REQUEST_GET_WIN32_MAJOR_MINOR_VERSIONS, NULL, 0, &Versions, 2*sizeof(ULONG), &Dummy))) {
+		return (Versions[0]>=6 && Versions[1]>=1);
+	}
+	return false; // failed to determine, fall back to false
+}
+

@@ -20,7 +20,7 @@
 
 */
 /*
-	Generated on Mittwoch, 12. November 2008 16:51:19. Do not EDIT!!!
+	Generated on Donnerstag, 14. Oktober 2010 11:08:05. Do not EDIT!!!
 */
 #define _WIN32_WINNT 0x0501	// we need WinXP anyways
 #include <windows.h>
@@ -126,6 +126,15 @@ namespace detail
 	HWND (WINAPI *OldCreateDialogIndirectParamW)(HINSTANCE,LPCDLGTEMPLATEW,HWND,DLGPROC,LPARAM) = CreateDialogIndirectParamW;
 	HWND (WINAPI *OldCreateMDIWindowA)(char const *,char const *,DWORD,INT,INT,INT,INT,HWND,HINSTANCE,LPARAM) = CreateMDIWindowA;
 	HWND (WINAPI *OldCreateMDIWindowW)(wchar_t const *,wchar_t const *,DWORD,INT,INT,INT,INT,HWND,HINSTANCE,LPARAM) = CreateMDIWindowW;
+	HDESK (WINAPI *OldCreateDesktopA)(char const *,char const *,LPDEVMODEA,DWORD,ACCESS_MASK,LPSECURITY_ATTRIBUTES) = CreateDesktopA;
+	HDESK (WINAPI *OldCreateDesktopW)(wchar_t const *,wchar_t const *,LPDEVMODEW,DWORD,ACCESS_MASK,LPSECURITY_ATTRIBUTES) = CreateDesktopW;
+	HDESK (WINAPI *OldOpenDesktopA)(char const *,DWORD,BOOL,ACCESS_MASK) = OpenDesktopA;
+	HDESK (WINAPI *OldOpenDesktopW)(wchar_t const *,DWORD,BOOL,ACCESS_MASK) = OpenDesktopW;
+	HDESK (WINAPI *OldOpenInputDesktop)(DWORD,BOOL,ACCESS_MASK) = OpenInputDesktop;
+	HWINSTA (WINAPI *OldCreateWindowStationA)(char const *,DWORD,ACCESS_MASK,LPSECURITY_ATTRIBUTES) = CreateWindowStationA;
+	HWINSTA (WINAPI *OldCreateWindowStationW)(wchar_t const *,DWORD,ACCESS_MASK,LPSECURITY_ATTRIBUTES) = CreateWindowStationW;
+	HWINSTA (WINAPI *OldOpenWindowStationA)(char const *,BOOL,ACCESS_MASK) = OpenWindowStationA;
+	HWINSTA (WINAPI *OldOpenWindowStationW)(wchar_t const *,BOOL,ACCESS_MASK) = OpenWindowStationW;
 	BOOL (WINAPI *OldDeleteObject)(HGDIOBJ) = DeleteObject;
 	BOOL (WINAPI *OldDeleteDC)(HDC) = DeleteDC;
 	BOOL (WINAPI *OldDeleteMetaFile)(HMETAFILE) = DeleteMetaFile;
@@ -140,6 +149,8 @@ namespace detail
 	BOOL (WINAPI *OldDestroyAcceleratorTable)(HACCEL) = DestroyAcceleratorTable;
 	BOOL (WINAPI *OldUnhookWindowsHookEx)(HHOOK) = UnhookWindowsHookEx;
 	BOOL (WINAPI *OldDestroyMenu)(HMENU) = DestroyMenu;
+	BOOL (WINAPI *OldCloseDesktop)(HDESK) = CloseDesktop;
+	BOOL (WINAPI *OldCloseWindowStation)(HWINSTA) = CloseWindowStation;
 	//
 	// cleanup callbacks
 	//
@@ -3852,6 +3863,339 @@ Epilog:
 		}
 		return ret_handle;
 	}
+	HDESK WINAPI MyCreateDesktopA(char const * a0,char const * a1,LPDEVMODEA a2,DWORD a3,ACCESS_MASK a4,LPSECURITY_ATTRIBUTES a5)
+	{
+		HDESK ret_handle=OldCreateDesktopA(a0,a1,a2,a3,a4,a5);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseDesktop;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_CreateDesktopA,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_CreateDesktopA,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HDESK WINAPI MyCreateDesktopW(wchar_t const * a0,wchar_t const * a1,LPDEVMODEW a2,DWORD a3,ACCESS_MASK a4,LPSECURITY_ATTRIBUTES a5)
+	{
+		HDESK ret_handle=OldCreateDesktopW(a0,a1,a2,a3,a4,a5);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseDesktop;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_CreateDesktopW,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_CreateDesktopW,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HDESK WINAPI MyOpenDesktopA(char const * a0,DWORD a1,BOOL a2,ACCESS_MASK a3)
+	{
+		HDESK ret_handle=OldOpenDesktopA(a0,a1,a2,a3);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseDesktop;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_OpenDesktopA,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_OpenDesktopA,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HDESK WINAPI MyOpenDesktopW(wchar_t const * a0,DWORD a1,BOOL a2,ACCESS_MASK a3)
+	{
+		HDESK ret_handle=OldOpenDesktopW(a0,a1,a2,a3);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseDesktop;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_OpenDesktopW,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_OpenDesktopW,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HDESK WINAPI MyOpenInputDesktop(DWORD a0,BOOL a1,ACCESS_MASK a2)
+	{
+		HDESK ret_handle=OldOpenInputDesktop(a0,a1,a2);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseDesktop;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_OpenInputDesktop,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_OpenInputDesktop,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HWINSTA WINAPI MyCreateWindowStationA(char const * a0,DWORD a1,ACCESS_MASK a2,LPSECURITY_ATTRIBUTES a3)
+	{
+		HWINSTA ret_handle=OldCreateWindowStationA(a0,a1,a2,a3);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseWindowStation;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_CreateWindowStationA,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_CreateWindowStationA,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HWINSTA WINAPI MyCreateWindowStationW(wchar_t const * a0,DWORD a1,ACCESS_MASK a2,LPSECURITY_ATTRIBUTES a3)
+	{
+		HWINSTA ret_handle=OldCreateWindowStationW(a0,a1,a2,a3);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseWindowStation;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_CreateWindowStationW,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_CreateWindowStationW,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HWINSTA WINAPI MyOpenWindowStationA(char const * a0,BOOL a1,ACCESS_MASK a2)
+	{
+		HWINSTA ret_handle=OldOpenWindowStationA(a0,a1,a2);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseWindowStation;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_OpenWindowStationA,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_OpenWindowStationA,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
+	HWINSTA WINAPI MyOpenWindowStationW(wchar_t const * a0,BOOL a1,ACCESS_MASK a2)
+	{
+		HWINSTA ret_handle=OldOpenWindowStationW(a0,a1,a2);
+		cleanup_callback_ret s;
+		s.FunctionTag=TRUE;
+		s.ctag=Function_CloseWindowStation;
+		// perform allocation tasks
+		if(0!=ret_handle && s.FunctionTag)
+		{
+			DWORD stack[32];
+			ULONG traceHash=0;
+			SHORT frames=pfnCaptureStackBackTrace(1, 32, reinterpret_cast<PVOID*>(&stack[0]), &traceHash);
+			FILETIME ts={0,0};
+			::GetSystemTimeAsFileTime(&ts);
+			allocations[ret_handle]=allocation(traceHash,ts);
+			if(!traceHash)	// has not been properly calculated; must be a shorty stack!
+			{
+				qqDebug("**********************");
+				qqDebug("Empty trace hash retrieved - call stack contains FPO-optimized functions! Stack trace record will not recorded!!");
+				qqDebug("**********************");
+			}
+			else
+			{
+				stackdb_type::iterator it=stackdb.find(traceHash);
+				if(it==stackdb.end())	// no matching stack record exists
+				{
+					handle_tag htag=GetHandleTag(Function_OpenWindowStationW,ret_handle);
+					stackdb[traceHash]=stack_trace(Function_OpenWindowStationW,s.ctag,htag,stack,frames);
+				}
+				else
+				{
+					it->second.allocationCount_ += 1;	// update allocation counter
+				}
+			}
+		}
+		return ret_handle;
+	}
 	BOOL WINAPI MyDeleteObject(HGDIOBJ a0)
 	{
 		BOOL ret_handle=OldDeleteObject(a0);
@@ -4326,6 +4670,76 @@ Epilog:
 					{
 						qqDebug("**********************");
 						qqDebug("* Inconsistent cleanup: DestroyMenu(0x%lx) invoked for handle created with '%s' (expected %s()), trace=0x%lx", handle, From(sit->second.ftag_), From(sit->second.ctag_), it->second.hash_);
+						qqDebug("**********************");
+						if(::IsDebuggerPresent()) ::DebugBreak();
+					}
+					allocations.erase(it); // dump this allocation
+				}
+				else
+				{
+					// no allocations recorded for this cleanup
+					qqDebug("**********************");
+					qqDebug("* Inconsistent cleanup: no allocation record for handle 0x%lx!",handle);
+					qqDebug("**********************");
+				}
+			}
+		}
+		return ret_handle;
+	}
+	BOOL WINAPI MyCloseDesktop(HDESK a0)
+	{
+		BOOL ret_handle=OldCloseDesktop(a0);
+		// perform cleanup tasks
+		{
+			HDESK handle=a0;
+			allocations_type::iterator it=allocations.find(handle);
+			if(it != allocations.end())	// matched an allocation
+			{
+				stackdb_type::iterator sit=stackdb.find(it->second.hash_);
+				if(sit != stackdb.end())
+				{
+					// look up corresponding stack trace record and remove it
+					sit->second.allocationCount_ -= 1;	// update allocation counter
+					// check allocation/cleanup consistency
+					if(Function_CloseDesktop != sit->second.ctag_)
+					{
+						qqDebug("**********************");
+						qqDebug("* Inconsistent cleanup: CloseDesktop(0x%lx) invoked for handle created with '%s' (expected %s()), trace=0x%lx", handle, From(sit->second.ftag_), From(sit->second.ctag_), it->second.hash_);
+						qqDebug("**********************");
+						if(::IsDebuggerPresent()) ::DebugBreak();
+					}
+					allocations.erase(it); // dump this allocation
+				}
+				else
+				{
+					// no allocations recorded for this cleanup
+					qqDebug("**********************");
+					qqDebug("* Inconsistent cleanup: no allocation record for handle 0x%lx!",handle);
+					qqDebug("**********************");
+				}
+			}
+		}
+		return ret_handle;
+	}
+	BOOL WINAPI MyCloseWindowStation(HWINSTA a0)
+	{
+		BOOL ret_handle=OldCloseWindowStation(a0);
+		// perform cleanup tasks
+		{
+			HWINSTA handle=a0;
+			allocations_type::iterator it=allocations.find(handle);
+			if(it != allocations.end())	// matched an allocation
+			{
+				stackdb_type::iterator sit=stackdb.find(it->second.hash_);
+				if(sit != stackdb.end())
+				{
+					// look up corresponding stack trace record and remove it
+					sit->second.allocationCount_ -= 1;	// update allocation counter
+					// check allocation/cleanup consistency
+					if(Function_CloseWindowStation != sit->second.ctag_)
+					{
+						qqDebug("**********************");
+						qqDebug("* Inconsistent cleanup: CloseWindowStation(0x%lx) invoked for handle created with '%s' (expected %s()), trace=0x%lx", handle, From(sit->second.ftag_), From(sit->second.ctag_), it->second.hash_);
 						qqDebug("**********************");
 						if(::IsDebuggerPresent()) ::DebugBreak();
 					}
@@ -4947,6 +5361,69 @@ Epilog:
 			bOk=FALSE;
 			goto Epilog;
 		}
+		Status=DetourAttach(&(PVOID&)OldCreateDesktopA,MyCreateDesktopA);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'CreateDesktop'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldCreateDesktopW,MyCreateDesktopW);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'CreateDesktop'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldOpenDesktopA,MyOpenDesktopA);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'OpenDesktop'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldOpenDesktopW,MyOpenDesktopW);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'OpenDesktop'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldOpenInputDesktop,MyOpenInputDesktop);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'OpenInputDesktop'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldCreateWindowStationA,MyCreateWindowStationA);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'CreateWindowStation'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldCreateWindowStationW,MyCreateWindowStationW);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'CreateWindowStation'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldOpenWindowStationA,MyOpenWindowStationA);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'OpenWindowStation'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldOpenWindowStationW,MyOpenWindowStationW);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'OpenWindowStation'");
+			bOk=FALSE;
+			goto Epilog;
+		}
 		Status=DetourAttach(&(PVOID&)OldDeleteObject,MyDeleteObject);
 		if(NO_ERROR!=Status)
 		{
@@ -5042,6 +5519,20 @@ Epilog:
 		if(NO_ERROR!=Status)
 		{
 			qqDebug("failed to detour 'DestroyMenu'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldCloseDesktop,MyCloseDesktop);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'CloseDesktop'");
+			bOk=FALSE;
+			goto Epilog;
+		}
+		Status=DetourAttach(&(PVOID&)OldCloseWindowStation,MyCloseWindowStation);
+		if(NO_ERROR!=Status)
+		{
+			qqDebug("failed to detour 'CloseWindowStation'");
 			bOk=FALSE;
 			goto Epilog;
 		}
@@ -5146,6 +5637,15 @@ Epilog:
 		DetourDetach(&(PVOID&)OldCreateDialogIndirectParamW,MyCreateDialogIndirectParamW);
 		DetourDetach(&(PVOID&)OldCreateMDIWindowA,MyCreateMDIWindowA);
 		DetourDetach(&(PVOID&)OldCreateMDIWindowW,MyCreateMDIWindowW);
+		DetourDetach(&(PVOID&)OldCreateDesktopA,MyCreateDesktopA);
+		DetourDetach(&(PVOID&)OldCreateDesktopW,MyCreateDesktopW);
+		DetourDetach(&(PVOID&)OldOpenDesktopA,MyOpenDesktopA);
+		DetourDetach(&(PVOID&)OldOpenDesktopW,MyOpenDesktopW);
+		DetourDetach(&(PVOID&)OldOpenInputDesktop,MyOpenInputDesktop);
+		DetourDetach(&(PVOID&)OldCreateWindowStationA,MyCreateWindowStationA);
+		DetourDetach(&(PVOID&)OldCreateWindowStationW,MyCreateWindowStationW);
+		DetourDetach(&(PVOID&)OldOpenWindowStationA,MyOpenWindowStationA);
+		DetourDetach(&(PVOID&)OldOpenWindowStationW,MyOpenWindowStationW);
 		DetourDetach(&(PVOID&)OldDeleteObject,MyDeleteObject);
 		DetourDetach(&(PVOID&)OldDeleteDC,MyDeleteDC);
 		DetourDetach(&(PVOID&)OldDeleteMetaFile,MyDeleteMetaFile);
@@ -5160,6 +5660,8 @@ Epilog:
 		DetourDetach(&(PVOID&)OldDestroyAcceleratorTable,MyDestroyAcceleratorTable);
 		DetourDetach(&(PVOID&)OldUnhookWindowsHookEx,MyUnhookWindowsHookEx);
 		DetourDetach(&(PVOID&)OldDestroyMenu,MyDestroyMenu);
+		DetourDetach(&(PVOID&)OldCloseDesktop,MyCloseDesktop);
+		DetourDetach(&(PVOID&)OldCloseWindowStation,MyCloseWindowStation);
 		DetourTransactionCommit();
 	}
 } // namespace detail
