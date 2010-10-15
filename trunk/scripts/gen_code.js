@@ -104,7 +104,8 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 	var dt_charptr=1,
 	 dt_logfont=2,
 	 dt_devmode=3,
-	 dt_cdlgtemplate=4;
+	 dt_cdlgtemplate=4,
+	 dt_lpdevmode=5;
 	// function tags
 	var function_allocation=1,
 	 function_cleanup=2;
@@ -273,6 +274,9 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 							break;
 						case dt_devmode:
 							args.push(ansi?"DEVMODEA const *":"DEVMODEW const *");
+							break;
+						case dt_lpdevmode:
+							args.push(ansi?"LPDEVMODEA":"LPDEVMODEW");
 							break;
 						case dt_cdlgtemplate:
 							args.push(ansi?"LPCDLGTEMPLATEA":"LPCDLGTEMPLATEW");
@@ -448,6 +452,7 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 		buf.o("#define _WIN32_WINNT 0x0501	// we need WinXP anyways");
 		buf.o("#include <windows.h>");
 		buf.o("#include <wingdi.h>");
+		buf.o("#include <stdio.h>\t// sprintf()");
 		buf.o("#include \"Intercepts.h\"");
 		buf.o("").o("");
 		buf.o("namespace detail\n{");
@@ -472,7 +477,9 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 				// default case
 				buf.o("case Handle_Undefined:").o("default:").o("{").p();
 					//buf.o("qqDebug(\"undefined function tag in From(function_tag): 0x%lx\",ftag);");
-					buf.o("return \"\";");
+					buf.o("static char buf[64];");
+					buf.o("sprintf(buf, \"0x%X\", static_cast<DWORD>(tag));");
+					buf.o("return buf;");
 				buf.m().o("}");
 			buf.m().o("}");
 		buf.m().o("}");
@@ -774,6 +781,10 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 		add_function("CreatePen","hpen",["int","int","COLORREF"]);
 		add_function("CreatePenIndirect","hpen",["LOGPEN const *"]);
 		add_function("ExtCreatePen","hpen",["DWORD","DWORD","LOGBRUSH const *","DWORD","DWORD const *"]);
+
+		/* additional cleanup function for regions : SetWindowRgn() 
+			sounds like multiple cleanup functions is a viable extension!!!
+		*/
 		add_function("PathToRegion","hrgn",["HDC"]);
 		add_function("CreateEllipticRgn","hrgn",["int","int","int","int"]);
 		add_function("CreateEllipticRgnIndirect","hrgn",["RECT const *"]);
@@ -783,6 +794,7 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 		add_function("CreateRectRgnIndirect","hrgn",["RECT const *"]);
 		add_function("CreateRoundRectRgn","hrgn",["int","int","int","int","int","int"]);
 		add_function("ExtCreateRegion","hrgn",["XFORM const *","DWORD","RGNDATA const *"]);
+
 		add_function("CreateHalftonePalette","hpalette",["HDC"]);
 		add_function("CreatePalette","hpalette",["LOGPALETTE const *"]);
 		
@@ -870,10 +882,30 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 		add_function("CreateDialogParam","hwnd",["hinstance",dt_charptr,"hwnd","dlgproc","lparam"]).b=true;
 		add_function("CreateDialogIndirectParam","hwnd",["hinstance",dt_cdlgtemplate,"hwnd","dlgproc","lparam"]).b=true;
 		add_function("CreateMDIWindow","hwnd",[dt_charptr,dt_charptr,"dword","int","int","int","int","hwnd","hinstance","lparam"]).b=true;
+
+		//set_cleanup("EndDialog");
+		//add_function("DialogBox", "INT_PTR");
+		//add_function("DialogBoxParam", "");
+		//add_function("DialogBoxIndirect", "");
+		//add_function("DialogBoxIndirectParam", "");
+
+		// handling gestures (?) ::CloseGestureHandle() and WM_GESTURE
 		
 		// wannabes
 		//set_cleanup("DestroyCaret");
 		//add_function("CreateCaret","hcaret",['LPACCEL','int']).b=true;
+		
+		//set_cleanup("EndPaint");
+		//add_function("BeginPaint", "hdc", ["hwnd", "LPPAINTSTRUCT"]);
+
+		set_cleanup("CloseDesktop");
+		add_function("CreateDesktop", "hdesk", [dt_charptr, dt_charptr, dt_lpdevmode, "DWORD", "ACCESS_MASK", "LPSECURITY_ATTRIBUTES"]).b=true;
+		add_function("OpenDesktop", "hdesk", [dt_charptr, "DWORD", "BOOL", "ACCESS_MASK"]).b=true;
+		add_function("OpenInputDesktop", "hdesk", ["DWORD", "BOOL", "ACCESS_MASK"]);
+
+		set_cleanup("CloseWindowStation");
+		add_function("CreateWindowStation", "HWINSTA", [dt_charptr, "DWORD", "ACCESS_MASK", "LPSECURITY_ATTRIBUTES"]).b=true;
+		add_function("OpenWindowStation", "HWINSTA", [dt_charptr, "BOOL", "ACCESS_MASK"]).b=true;
 
 		// resource cleanup
 		add_cleanupfunction("DeleteObject","bool",["HGDIOBJ"]);
@@ -893,6 +925,8 @@ if(WScript.Arguments.Named.Item("odir") === undefined)
 		add_cleanupfunction("DestroyAcceleratorTable","bool",["haccel"]);
 		add_cleanupfunction("UnhookWindowsHookEx","bool",["hhook"]);
 		add_cleanupfunction("DestroyMenu","bool",["hmenu"]);
+		add_cleanupfunction("CloseDesktop", "bool", ["HDESK"]);
+		add_cleanupfunction("CloseWindowStation", "bool", ["HWINSTA"]);
 
 		// generate code
 		gen_code();
